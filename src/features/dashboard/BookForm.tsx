@@ -1,11 +1,19 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import { makeStyles } from '@mui/styles';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import axiosInstance from '../../utils/axios.js';
+import axiosInstance from '../../utils/axios';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+
+interface Book {
+  id: string;
+  author: string;
+  book_name: string;
+  img: string;
+  description: string;
+  price: string;
+}
 
 const useStyles = makeStyles(() => ({
   form: {
@@ -24,11 +32,16 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const BookForm = ({ data }) => {
-  const { id } = useParams();
+interface Props {
+  data: 'create' | 'edit';
+}
+
+const BookForm: React.FC<Props> = ({ data }) => {
+  const { id } = useParams<{ id: string }>();
   const classes = useStyles();
-  const [selectedBook, setSelectedBook] = useState({});
-  const [formData, setFormData] = useState({
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [formData, setFormData] = useState<Book>({
+    id: '',
     author: '',
     book_name: '',
     img: '',
@@ -38,40 +51,39 @@ const BookForm = ({ data }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    (async function getProduct() {
+    const getProduct = async () => {
       try {
-        let { data: book } = await axiosInstance.get(`/books/${id}`);
+        const { data: book } = await axiosInstance.get<Book>(`/books/${id}`);
         if (book) {
           setFormData({
-            author: book?.author,
-            book_name: book?.book_name,
-            img: book?.img,
-            description: book?.description,
-            price: book?.price,
+            ...book,
           });
-
           setSelectedBook(book);
         }
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
-    })();
-  }, []);
+    };
 
-  const handleChange = (e) => {
+    if (data === 'edit') {
+      getProduct();
+    }
+  }, [data, id]);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    let hasUser = false;
-    let newBook = formData;
-    newBook.id = new Date();
     if (data === 'create') {
       try {
-        let { data: book } = await axiosInstance.post('/books', newBook);
+        const { data: book } = await axiosInstance.post<Book>(
+          '/books',
+          formData
+        );
         if (book) {
-          toast.success('Book create succesfully', {
+          toast.success('Book created successfully', {
             pauseOnHover: true,
           });
           setTimeout(() => {
@@ -81,17 +93,14 @@ const BookForm = ({ data }) => {
       } catch (error) {
         toast.error(error.message);
       }
-      console.log(formData);
     } else {
-      let editBook = formData;
-      editBook.id = id;
       try {
-        let { data: edited } = await axiosInstance.put(
+        const { data: edited } = await axiosInstance.put<Book>(
           `/books/${id}`,
-          editBook
+          formData
         );
         if (edited) {
-          toast.success('Book edit succesfully', {
+          toast.success('Book edited successfully', {
             pauseOnHover: true,
           });
           setTimeout(() => {
@@ -101,7 +110,6 @@ const BookForm = ({ data }) => {
       } catch (error) {
         toast.error(error.message);
       }
-      console.log(formData);
     }
   };
 

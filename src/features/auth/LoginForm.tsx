@@ -1,8 +1,8 @@
-import React, { HtmlHTMLAttributes, useState } from 'react';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { makeStyles } from '@mui/styles';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import axiosInstance from '../../utils/axios.js';
+import axiosInstance from '../../utils/axios';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,34 +23,39 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const LoginForm = () => {
+interface FormData {
+  email: string;
+  password: string;
+}
+
+const LoginForm: React.FC = () => {
   const classes = useStyles();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
   });
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     let hasUser = false;
     try {
-      let { data: users } = await axiosInstance.get('users');
+      const { data: users } = await axiosInstance.get('users');
       if (users) {
-        users.forEach((item) => {
+        users.forEach((item: { email: string; password: string }) => {
           if (
-            item.email == formData.email &&
+            item.email === formData.email &&
             item.password === formData.password
           ) {
             hasUser = true;
           }
         });
         if (hasUser) {
-          toast.success('You Sign In successfully', {
+          toast.success('You signed in successfully', {
             pauseOnHover: true,
           });
           setTimeout(() => {

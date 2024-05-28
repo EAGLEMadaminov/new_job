@@ -1,23 +1,25 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
-import { changeSearchValue } from '../../redux/slices/book.js';
-import axiosInstance from '../../utils/axios.js';
+import { changeSearchValue, Book } from '../../redux/slices/book'; // Assuming you have a Book type defined
+import axiosInstance from '../../utils/axios';
 
-const Header = () => {
-  const { id } = useParams();
+const Header: React.FC = () => {
+  const { id } = useParams<{ id: string }>(); // Assuming id is a string
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const handleDeleteBtn = async () => {
     try {
-      let { data: deletedBook } = await axiosInstance.delete(`/books/${id}`);
+      let { data: deletedBook } = await axiosInstance.delete<Book>(
+        `/books/${id}`
+      );
       if (deletedBook) {
-        toast.success('Book deleted succesfully');
+        toast.success('Book deleted successfully');
         setTimeout(() => {
           navigate('/dashboard/books');
         }, 3000);
@@ -27,9 +29,10 @@ const Header = () => {
     }
   };
 
-  const handleSearch = (value) => {
+  const handleSearch = (value: string) => {
     dispatch(changeSearchValue(value));
   };
+
   return (
     <div className="header">
       <h1 onClick={() => navigate('/dashboard/books')}>Books</h1>

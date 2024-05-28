@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { makeStyles } from '@mui/styles';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import axiosInstance from '../../utils/axios.js';
+import axiosInstance from '../../utils/axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
@@ -23,28 +23,33 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const RegisterForm = () => {
+interface FormData {
+  name: string;
+  email: string;
+  password: string;
+}
+
+const RegisterForm: React.FC = () => {
   const classes = useStyles();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: '',
     email: '',
     password: '',
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    let date = new Date();
-    let data = formData;
-    data.id = date;
+    const date = new Date();
+    const data = { ...formData, id: date };
     try {
-      let { data: register } = await axiosInstance.post('/users', data);
+      const { data: register } = await axiosInstance.post('/users', data);
       if (register) {
-        toast.success('You Sign Up successfully', {
+        toast.success('You signed up successfully', {
           pauseOnHover: true,
         });
         setTimeout(() => {
@@ -54,7 +59,6 @@ const RegisterForm = () => {
     } catch (error) {
       console.log(error);
     }
-    // console.log(data);
   };
 
   return (

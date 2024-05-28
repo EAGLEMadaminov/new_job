@@ -1,0 +1,67 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.header {
+  display: flex;
+  padding: 10px 50px;
+  width: 100%;
+  position: fixed;
+  justify-content: space-around;
+}
+.header h1 {
+  cursor: pointer;
+}
+.header input {
+  width: 400px;
+  border-radius: 20px;
+  padding: 10px 20px;
+}
+.create_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  height: 100vh;
+}
+.create_container h1 {
+  margin-bottom: 20px;
+}
+.books_container {
+  display: flex;
+  margin-top: 40px;
+  justify-content: space-around;
+  flex-wrap: wrap;
+}
+.single_book {
+  padding: 20px;
+  width: 250px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.single_book h1 {
+  font-size: 20px;
+}
+.single_book img {
+  width: 100%;
+  height: 200px;
+  object-fit: contain;
+}
+.single_book h2 {
+  font-size: 18px;
+}
+.single_book:hover {
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  border-radius: 20px;
+}
+
+.view_book_info {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  gap: 10px;
+  margin-left: 30px;
+}
